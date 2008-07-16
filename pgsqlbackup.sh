@@ -3,6 +3,8 @@
 # PostgreSQL backup script, by Bjørn Arild Mæland <bjorn.maeland at gmail.com>
 # WWW: http://github.com/Chrononaut/pgsqlbackup/tree/master
 
+PATH="/bin:/usr/bin:/opt/local/bin"
+
 # Load config
 if [ ! -f config ]; then
   echo "Copy config.sample to config and edit the settings, then run this script again."
@@ -12,9 +14,7 @@ source config
 
 # Functions
 create_and_cd() {
-  if [ ! -d $1 ]; then
-    mkdir -p $1
-  fi
+  if [ ! -d $1 ]; then mkdir -p $1; fi
   cd $1
 }
 
@@ -38,11 +38,9 @@ done
 cd ..
 
 # Cleanup old dirs
-while [ `ls|wc -l` -gt $KEEP ]; do
-  rm -rf `ls|head -1`
-done
+while [ `ls|wc -l` -gt $KEEP ]; do rm -rf `ls|head -1`; done
 
-if [ "$POSTHOOK" ]; then
-  eval $POSTHOOK
+if [ "$POSTHOOKS" ]; then
+  for hook in $POSTHOOKS; do eval $hook; done
 fi
 

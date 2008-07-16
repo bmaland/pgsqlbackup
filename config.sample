@@ -21,5 +21,8 @@ COMPRESSOR="bzip2"
 # multiple databases with a single matching word.
 EXCLUDE="test development postgres template"
 
-# Post hook, can be used send mails or copy the files offsite, etc.
-#POSTHOOK="zsh /home/USER/pgsqlbackup/hooks/post/rsync.sh $BACKUPDIR user@host:/path"
+# Post backup hooks, can be used send mails or copy the files offsite, etc.
+# One per line, don't separate the lines with commas.
+#POSTHOOKS=(
+#  "zsh /home/USER/pgsqlbackup/hooks/post/rsync.sh $BACKUPDIR user@host:/path"
+#)
