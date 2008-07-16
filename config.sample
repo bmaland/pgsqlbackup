@@ -8,7 +8,7 @@ PGUSER="USER"
 # Please keep a trailing slash.
 BACKUPDIR="/home/USER/pgsql_backups/"
 
-# Directory to put todays backup
+# Directory to put todays backup. The default uses European date format.
 DIR=`date +%d-%m-%Y`
 
 # Number of copies to keep
