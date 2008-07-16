@@ -28,10 +28,14 @@ if [ "$EXCLUDE" ]; then
 fi
 
 create_and_cd $BACKUPDIR
+if [ -d $DIR ]; then rm -rf $DIR; fi
 create_and_cd $DIR
 
+pg_args="-F t -U $PGUSER"
+if [ "$PGHOST" ]; then pg_args="$pg_args -h $PGHOST"; fi
+
 for db in `echo $DATABASES`; do
-  pg_dump -U $PGUSER -h $PGHOST -F t $db > $db.tar
+  eval "pg_dump $pg_args $db > $db.tar"
   $COMPRESSOR $db.tar
 done
 

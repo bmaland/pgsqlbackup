@@ -2,7 +2,7 @@
 
 # Postgres
 PGUSER="USER"
-PGHOST="localhost"
+#PGHOST="localhost"
 
 # Root dir for backups - don't store other files here as they could get deleted by the script.
 # Please keep a trailing slash.
@@ -17,12 +17,15 @@ KEEP=14
 # Which compressor to use (gzip/bzip2)
 COMPRESSOR="bzip2"
 
+# Databases to back up, separated by spaces. This is void if EXCLUDE is defined.
+#DATABASES=""
+
 # Since each element in this list is passed to an inverted grep, you can exclude
-# multiple databases with a single matching word.
+# multiple databases with a single matching word. Uncomment if you define DATABASES.
 EXCLUDE="test development postgres template"
 
 # Post backup hooks, can be used send mails or copy the files offsite, etc.
 # One per line, don't separate the lines with commas.
 #POSTHOOKS=(
-#  "zsh /home/USER/pgsqlbackup/hooks/post/rsync.sh $BACKUPDIR user@host:/path"
+#  "zsh /home/USER/pgsqlbackup/hooks/rsync.sh $BACKUPDIR user@host:/path"
 #)
