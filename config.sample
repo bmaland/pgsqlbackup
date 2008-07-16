@@ -1,0 +1,23 @@
+# Configuration for pgsqlbackup
+
+# Postgres user
+USER="USER"
+
+# Root dir for backups - don't store other files here as they could get deleted by the script.
+BACKUPDIR="/home/USER/pgsql_backups"
+
+# Directory to put the backup files
+DIR=`date +%d-%m-%Y`
+
+# Number of copies to keep
+KEEP=14
+
+# Which compressor to use (gzip/bzip2)
+COMPRESSOR="bzip2"
+
+# Since each element in this list is passed to an inverted grep, you can exclude
+# multiple databases with a single matching word.
+EXCLUDE="test development postgres template"
+
+# Post hook, can be used send mails or copy the files offsite, etc.
+#POSTHOOK="zsh /home/USER/pgsqlbackup/hooks/post/rsync.sh"
