@@ -18,8 +18,24 @@ create_and_cd() {
   cd $1
 }
 
+exception() {
+  echo $1
+  if [ $EXCEPTIONHOOKS ]; then
+    for hook in $EXCEPTIONHOOKS; do eval $hook \"$1\"; done
+  fi
+  exit
+}
+
+# Check for connectivity
+pg_args="-U $PGUSER"
+if [ $PGHOST ]; then pg_args="$pg_args -h $PGHOST"; fi
+
+if [ -z `eval "psql $pg_args -l 2>/dev/null"` ]; then
+  exception "No db connectivity"
+fi
+
 # The rest
-if [ "$EXCLUDE" ]; then
+if [ $EXCLUDE ]; then
   DATABASES=`psql -U $USER -l | grep "^ \w" |  awk -F '|' '{ printf("%s\n", $1) }' | sed 's/ //g'`
 
   for ex in `echo $EXCLUDE`; do
@@ -31,9 +47,9 @@ create_and_cd $BACKUPDIR
 if [ -d $DIR ]; then rm -rf $DIR; fi
 create_and_cd $DIR
 
-pg_args="-F t -U $PGUSER"
-if [ "$PGHOST" ]; then pg_args="$pg_args -h $PGHOST"; fi
+pg_args="$pg_args -F t"
 
+# TODO check for errors
 for db in `echo $DATABASES`; do
   eval "pg_dump $pg_args $db > $db.tar"
   $COMPRESSOR $db.tar
@@ -44,7 +60,8 @@ cd ..
 # Cleanup old dirs
 while [ `ls|wc -l` -gt $KEEP ]; do rm -rf `ls|head -1`; done
 
-if [ "$POSTHOOKS" ]; then
+if [ $POSTHOOKS ]; then
   for hook in $POSTHOOKS; do eval $hook; done
 fi
 
+echo "Backup completed successfully"

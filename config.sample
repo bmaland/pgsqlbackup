@@ -24,6 +24,10 @@ COMPRESSOR="bzip2"
 # multiple databases with a single matching word. Uncomment if you define DATABASES.
 EXCLUDE="test development postgres template"
 
+# Exception hooks, triggered i.e if the database connection is down.
+# The error message is provided as an argument.
+#EXCEPTIONHOOKS=("zsh /home/USER/pgsqlbackup/hooks/exception.sh")
+
 # Post backup hooks, can be used send mails or copy the files offsite, etc.
 # One per line, don't separate the lines with commas.
 #POSTHOOKS=(
