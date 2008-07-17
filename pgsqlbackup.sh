@@ -31,7 +31,7 @@ pg_args="-U $PGUSER"
 if [ $PGHOST ]; then pg_args="$pg_args -h $PGHOST"; fi
 
 if [ -z `eval "psql $pg_args -l 2>/dev/null"` ]; then
-  exception "No db connectivity"
+  exception "Could not connect to PostgreSQL database!"
 fi
 
 # The rest

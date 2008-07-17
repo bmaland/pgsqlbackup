@@ -9,6 +9,8 @@ wanted something that
 
 So, this is my attempt. It's still in a very early stage but suitable
 for simple use cases. Usage is simple, just look at config.sample.
+The script is developed/tested only with zsh, but probably works with
+bash as well.
 
 You'll probably want to run this from crontab:
 

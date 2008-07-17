@@ -1,12 +1,12 @@
 # Configuration for pgsqlbackup
 
 # Postgres
-PGUSER="USER"
+PGUSER="$USER"
 #PGHOST="localhost"
 
 # Root dir for backups - don't store other files here as they could get deleted by the script.
 # Please keep a trailing slash.
-BACKUPDIR="/home/USER/pgsql_backups/"
+BACKUPDIR="/home/$USER/pgsql_backups/"
 
 # Directory to put todays backup. The default uses European date format.
 DIR=`date +%d-%m-%Y`
@@ -25,11 +25,14 @@ COMPRESSOR="bzip2"
 EXCLUDE="test development postgres template"
 
 # Exception hooks, triggered i.e if the database connection is down.
-# The error message is provided as an argument.
-#EXCEPTIONHOOKS=("zsh /home/USER/pgsqlbackup/hooks/exception.sh")
+# The error message is provided as an argument. The default hook simply logs the
+# error to a txt file, with a timestamp.
+#EXCEPTIONHOOKS=(
+#  "/home/$USER/pgsqlbackup/hooks/log-exceptions.sh /home/$USER/pgsqlbackup_errors.txt"
+#)
 
 # Post backup hooks, can be used send mails or copy the files offsite, etc.
 # One per line, don't separate the lines with commas.
 #POSTHOOKS=(
-#  "zsh /home/USER/pgsqlbackup/hooks/rsync.sh $BACKUPDIR user@host:/path"
+#  "/home/$USER/pgsqlbackup/hooks/rsync.sh $BACKUPDIR user@host:/path"
 #)
