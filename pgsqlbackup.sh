@@ -6,11 +6,11 @@
 PATH="/bin:/usr/bin:/opt/local/bin"
 
 # Load config
-if [ ! -f config ]; then
+if [ ! -f "`dirname $0`/config" ]; then
   echo "Copy config.sample to config and edit the settings, then run this script again."
   exit
 fi
-source config
+source "`dirname $0`/config"
 
 # Functions
 create_and_cd() {

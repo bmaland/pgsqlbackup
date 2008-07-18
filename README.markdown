@@ -16,7 +16,7 @@ You'll probably want to run this from crontab:
 
     crontab -e
 
-    01 01 * * * /home/USER/pgsqlbackup/pgsqlbackup.sh
+    01 00 * * * /home/USER/pgsqlbackup/pgsqlbackup.sh
 
 This example runs the script daily at midnight.
 

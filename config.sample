@@ -28,7 +28,7 @@ EXCLUDE="test development postgres template"
 # The error message is provided as an argument. The default hook simply logs the
 # error to a txt file, with a timestamp.
 #EXCEPTIONHOOKS=(
-#  "/home/$USER/pgsqlbackup/hooks/log-exceptions.sh /home/$USER/pgsqlbackup_errors.txt"
+#  "/home/$USER/pgsqlbackup/hooks/log_exceptions.sh /home/$USER/pgsqlbackup_errors.txt"
 #)
 
 # Post backup hooks, can be used send mails or copy the files offsite, etc.
