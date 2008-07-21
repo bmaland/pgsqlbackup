@@ -13,11 +13,20 @@ fi
 source "`dirname $0`/config"
 
 # Functions
+
+# Cd's into a given dir - creates if it doesn't already exist.
+# Throws an exception if the directory is illegal.
 create_and_cd() {
   if [ ! -d $1 ]; then mkdir -p $1; fi
-  cd $1
+  if [ -d $1 ]; then
+    cd $1
+  else
+    exception "Illegal directory: $1"
+  fi
 }
 
+# Echoes out an exception message, triggers the exception hooks and
+# then exits the script to prevent further damage.
 exception() {
   echo $1
   if [ $EXCEPTIONHOOKS ]; then
@@ -26,13 +35,20 @@ exception() {
   exit
 }
 
-# Check for connectivity
+# Somewhat of an assertion checker. Throws an exception if the given statement
+# is false. This function is really fragile atm - it breaks if it receives "weird" data.
+assert() {
+  eval "if [ ! $1 ]; then exception \"$2\"; fi"
+}
+
+# Builds the connection string
 pg_args="-U $PGUSER"
 if [ $PGHOST ]; then pg_args="$pg_args -h $PGHOST"; fi
 
-if [ -z `eval "psql $pg_args -l 2>/dev/null"` ]; then
-  exception "Could not connect to PostgreSQL database!"
-fi
+# Tests the given connection information to the database:
+# We check if the database list is null - if so we throw an exception.
+dbs=`eval "psql $pg_args -l 2>/dev/null|head -1"`
+assert "! -z $dbs" "Could not connect to PostgreSQL database!"
 
 # The rest
 if [ $EXCLUDE ]; then
@@ -44,6 +60,7 @@ if [ $EXCLUDE ]; then
 fi
 
 create_and_cd $BACKUPDIR
+assert "`pwd`/ = $BACKUPDIR" "Could not cd to backupdir: $BACKUPDIR"
 if [ -d $DIR ]; then rm -rf $DIR; fi
 create_and_cd $DIR
 
@@ -56,6 +73,7 @@ for db in `echo $DATABASES`; do
 done
 
 cd ..
+assert "`pwd`/ = $BACKUPDIR" "Could not cd to backupdir: $BACKUPDIR"
 
 # Cleanup old dirs
 while [ `ls|wc -l` -gt $KEEP ]; do rm -rf `ls|head -1`; done
