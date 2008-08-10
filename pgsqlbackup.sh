@@ -6,39 +6,27 @@
 PATH="/bin:/usr/bin:/usr/local/bin:/opt/local/bin"
 
 # Load config
-if [ ! -f "`dirname $0`/config" ]; then
+if [[ ! -f "`dirname $0`/config" ]]; then
   echo "Copy config.sample to config and edit the settings, then run this script again."
   exit
 fi
 source "`dirname $0`/config"
 
-# Functions
-
 # Cd's into a given dir - creates if it doesn't already exist.
 # Throws an exception if the directory is illegal.
 create_and_cd() {
-  if [ ! -d $1 ]; then mkdir -p $1; fi
-  if [ -d $1 ]; then
-    cd $1
-  else
-    exception "Illegal directory: $1"
-  fi
+  if [ ! -d $1 ]; then mkdir -p $1 || exception "Could not create directory: $1"; fi
+  cd $1 || exception "Could not cd to directory: $1"
 }
 
 # Echoes out an exception message, triggers the exception hooks and
-# then exits the script to prevent further damage.
+# then exits the script with an error code.
 exception() {
   echo $1
   if [ $EXCEPTIONHOOKS ]; then
     for hook in $EXCEPTIONHOOKS; do eval $hook \"$1\"; done
   fi
   exit 1
-}
-
-# Somewhat of an assertion checker. Throws an exception if the given statement
-# is false. This function is really fragile atm - it breaks if it receives "weird" data.
-assert() {
-  eval "if [ ! $1 ]; then exception \"$2\"; fi"
 }
 
 # Builds the connection string
@@ -48,35 +36,34 @@ if [ $PGHOST ]; then pg_args+="-h $PGHOST"; fi
 
 # Tests the given connection information to the database:
 # We check if the database list is null - if so we throw an exception.
-eval psql $pg_args -l 2>/dev/null || exception "Could not connect to PostgreSQL database!"
+DBS=`psql ${=pg_args} -l` || exception "Could not connect to PostgreSQL database!"
 
-# The rest
-if [ $EXCLUDE ]; then
-  DATABASES=`psql -U $USER -l | grep "^ \w" |  awk -F '|' '{ printf("%s\n", $1) }' | sed 's/ //g'`
+if (( ! ${#DATABASES} )); then
+  DATABASES=`echo $DBS|grep "^ \w"|awk -F '|' '{printf("%s\n", $1)}'|sed 's/ //g'`
 
-  for ex in `echo $EXCLUDE`; do
-    DATABASES=`echo $DATABASES | grep -v $ex`
-  done
+  if (( ${#EXCLUDE} )); then
+    for ex in $EXCLUDE; do
+      DATABASES=`echo $DATABASES | grep -v $ex`
+    done
+  fi
 fi
 
-echo $DATABASES
-exit
+DATABASES=(${=DATABASES}) # Make an array of the databaselist
+if (( ! ${#DATABASES} )); then exception "No suitable databases listed!"; fi
 
 create_and_cd $BASEDIR
-assert "`pwd`/ = $BASEDIR" "Could not cd to backupdir: $BASEDIR"
-if [ -d $BACKUPDIR ]; then rm -rf $BACKUPDIR; fi
+
+if [[ -d $BACKUPDIR ]]; then rm -rf $BACKUPDIR; fi
 create_and_cd $BACKUPDIR
 
-pg_args="$pg_args -F t"
+pg_args+=" -F t"
 
-# TODO check for errors
-for db in `echo $DATABASES`; do
+for db in $DATABASES; do
   eval "pg_dump $pg_args $db > $db.tar"
   $COMPRESSOR $db.tar
 done
 
 cd ..
-assert "`pwd`/ = $BASEDIR" "Could not cd to backupdir: $BASEDIR"
 
 # Cleanup old dirs
 while [ `ls|wc -l` -gt $KEEP ]; do rm -rf `ls|head -1`; done

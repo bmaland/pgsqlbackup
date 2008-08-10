@@ -1,6 +1,6 @@
 # Configuration for pgsqlbackup
 
-# Postgres
+# Uncomment and configure your Postgres connection, if needed
 #PGUSER=$USER
 #PGHOST="localhost"
 
@@ -17,12 +17,12 @@ KEEP=14
 # Which compressor to use (gzip/bzip2)
 COMPRESSOR=bzip2
 
-# Databases to back up, separated by spaces. This is void if EXCLUDE is defined.
-#DATABASES=""
+# Databases to back up, separated by spaces.
+#DATABASES=()
 
 # Since each element in this list is passed to an inverted grep, you can exclude
 # multiple databases with a single matching word. Uncomment if you define DATABASES.
-EXCLUDE="test development postgres template"
+EXCLUDE=(test development postgres template)
 
 # Exception hooks, triggered i.e if the database connection is down.
 # The error message is provided as an argument. The default hook simply logs the
