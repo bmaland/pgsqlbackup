@@ -3,7 +3,7 @@
 # PostgreSQL backup script, by Bjørn Arild Mæland <bjorn.maeland at gmail.com>
 # WWW: http://github.com/Chrononaut/pgsqlbackup/tree/master
 
-PATH="/bin:/usr/bin:/opt/local/bin"
+PATH="/bin:/usr/bin:/usr/local/bin:/opt/local/bin"
 
 # Load config
 if [ ! -f "`dirname $0`/config" ]; then
@@ -32,7 +32,7 @@ exception() {
   if [ $EXCEPTIONHOOKS ]; then
     for hook in $EXCEPTIONHOOKS; do eval $hook \"$1\"; done
   fi
-  exit
+  exit 1
 }
 
 # Somewhat of an assertion checker. Throws an exception if the given statement
@@ -42,13 +42,13 @@ assert() {
 }
 
 # Builds the connection string
-pg_args="-U $PGUSER"
-if [ $PGHOST ]; then pg_args="$pg_args -h $PGHOST"; fi
+pg_args=""
+if [ $PGUSER ]; then pg_args+="-U $PGUSER"; fi
+if [ $PGHOST ]; then pg_args+="-h $PGHOST"; fi
 
 # Tests the given connection information to the database:
 # We check if the database list is null - if so we throw an exception.
-dbs=`eval "psql $pg_args -l 2>/dev/null|head -1"`
-assert "! -z $dbs" "Could not connect to PostgreSQL database!"
+eval psql $pg_args -l 2>/dev/null || exception "Could not connect to PostgreSQL database!"
 
 # The rest
 if [ $EXCLUDE ]; then
@@ -59,10 +59,13 @@ if [ $EXCLUDE ]; then
   done
 fi
 
+echo $DATABASES
+exit
+
+create_and_cd $BASEDIR
+assert "`pwd`/ = $BASEDIR" "Could not cd to backupdir: $BASEDIR"
+if [ -d $BACKUPDIR ]; then rm -rf $BACKUPDIR; fi
 create_and_cd $BACKUPDIR
-assert "`pwd`/ = $BACKUPDIR" "Could not cd to backupdir: $BACKUPDIR"
-if [ -d $DIR ]; then rm -rf $DIR; fi
-create_and_cd $DIR
 
 pg_args="$pg_args -F t"
 
@@ -73,7 +76,7 @@ for db in `echo $DATABASES`; do
 done
 
 cd ..
-assert "`pwd`/ = $BACKUPDIR" "Could not cd to backupdir: $BACKUPDIR"
+assert "`pwd`/ = $BASEDIR" "Could not cd to backupdir: $BASEDIR"
 
 # Cleanup old dirs
 while [ `ls|wc -l` -gt $KEEP ]; do rm -rf `ls|head -1`; done

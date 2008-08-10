@@ -1,21 +1,21 @@
 # Configuration for pgsqlbackup
 
 # Postgres
-PGUSER="$USER"
+#PGUSER=$USER
 #PGHOST="localhost"
 
-# Root dir for backups - don't store other files here as they could get deleted by the script.
-# Please keep a trailing slash.
-BACKUPDIR="/home/$USER/pgsql_backups/"
+# Base dir for backups - don't store other files here as they could get deleted
+# by the script. Please keep a trailing slash.
+BASEDIR="/home/$USER/pgsql_backups/"
 
-# Directory to put todays backup. The default uses European date format.
-DIR=`date +%d-%m-%Y`
+# Directory to put todays backup.
+BACKUPDIR=`date +%m-%d-%Y`
 
 # Number of copies to keep
 KEEP=14
 
 # Which compressor to use (gzip/bzip2)
-COMPRESSOR="bzip2"
+COMPRESSOR=bzip2
 
 # Databases to back up, separated by spaces. This is void if EXCLUDE is defined.
 #DATABASES=""
