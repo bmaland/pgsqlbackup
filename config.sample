@@ -1,6 +1,6 @@
 # Configuration for pgsqlbackup
 
-# Uncomment and configure your Postgres connection, if needed
+# Uncomment to configure your Postgres connection, if needed
 #PGUSER=$USER
 #PGHOST="localhost"
 
@@ -11,13 +11,15 @@ BASEDIR="/home/$USER/pgsql_backups/"
 # Directory to put todays backup.
 BACKUPDIR=`date +%m-%d-%Y`
 
-# Number of copies to keep
+# Number of copies to keep. Note that when this number is reached, the directory
+# with the oldest modification date will be deleted.
 KEEP=14
 
 # Which compressor to use (gzip/bzip2)
 COMPRESSOR=bzip2
 
-# Databases to back up, separated by spaces.
+# Databases to back up, separated by spaces. If you don't define this, every database
+# except those matched by the EXCLUDE pattern will be backed up.
 #DATABASES=()
 
 # Since each element in this list is passed to an inverted grep, you can exclude
@@ -26,7 +28,7 @@ EXCLUDE=(test development postgres template)
 
 # Exception hooks, triggered i.e if the database connection is down.
 # The error message is provided as an argument. The default hook simply logs the
-# error to a txt file, with a timestamp.
+# error to a txt file, with a timestamp, but this could be used to send an email etc.
 #EXCEPTIONHOOKS=(
 #  "/home/$USER/pgsqlbackup/hooks/log_exceptions.sh /home/$USER/pgsqlbackup_errors.txt"
 #)

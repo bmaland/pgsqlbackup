@@ -20,4 +20,8 @@ You'll probably want to run this from crontab:
 
 This example runs the script daily at midnight.
 
+The backups are stored in psql's tar format. To restore:
+
+    pg_restore -d targetdb -F t sourcedb.tar
+
 Contributions are very welcome.
