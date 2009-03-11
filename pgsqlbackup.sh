@@ -14,7 +14,7 @@ source "`dirname $0`/config"
 
 # Cd's into a given dir - creates if it doesn't already exist.
 # Throws an exception if the directory is illegal.
-create_and_cd() {
+cd_or_create_and_cd() {
   if [ ! -d $1 ]; then mkdir -p $1 || exception "Could not create directory: $1"; fi
   cd $1 || exception "Could not cd to directory: $1"
 }
@@ -51,10 +51,9 @@ fi
 DATABASES=(${=DATABASES}) # Make an array of the databaselist
 if (( ! ${#DATABASES} )); then exception "No suitable databases listed!"; fi
 
-create_and_cd $BASEDIR
-
+cd_or_create_and_cd $BASEDIR
 if [[ -d $BACKUPDIR ]]; then rm -rf $BACKUPDIR; fi
-create_and_cd $BACKUPDIR
+cd_or_create_and_cd $BACKUPDIR
 
 pg_args+=" -F t"
 
@@ -66,7 +65,7 @@ done
 cd ..
 
 # Cleanup old dirs
-while [ `ls|wc -l` -gt $KEEP ]; do rm -rf `ls|head -1`; done
+while [ `ls|wc -l` -gt $KEEP ]; do rm -rf `ls -tr|head -1`; done
 
 if [ $POSTHOOKS ]; then
   for hook in $POSTHOOKS; do eval $hook; done
